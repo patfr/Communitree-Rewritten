@@ -14,13 +14,18 @@ import prestige from "./layers/prestige";
  * @hidden
  */
 export const main = createLayer("main", () => {
-    const points = createResource<DecimalSource>(10);
+    const points = createResource<DecimalSource>(10, "", 2);
     const best = trackBest(points);
     const total = trackTotal(points);
 
     const pointGain = computed(() => {
         // eslint-disable-next-line prefer-const
-        let gain = new Decimal(1);
+        let gain = new Decimal(0);
+        if (prestige.upgrades.Beginning.bought.value) gain = new Decimal(1);
+        if (prestige.upgrades.Init.bought.value)
+            gain = gain.mul(prestige.upgradeEffects.InitEffect.value);
+        if (prestige.upgrades.Pro.bought.value)
+            gain = gain.mul(prestige.upgradeEffects.ProEffect.value);
         return gain;
     });
     globalBus.on("update", diff => {

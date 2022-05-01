@@ -1,11 +1,11 @@
 {
-	"title": "Profectus",
-	"id": "profectus",
-	"author": "thepaperpilot",
+	"title": "Communitree-Rewritten",
+	"id": "communitree",
+	"author": "patfr",
 	"discordName": "The Paper Pilot Community",
 	"discordLink": "https://discord.gg/WzejVAx",
 
-	"versionNumber": "0.0",
+	"versionNumber": "0.1",
 	"versionTitle": "Initial Commit",
 
 	"allowGoBack": true,
