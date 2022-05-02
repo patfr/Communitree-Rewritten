@@ -144,7 +144,7 @@ export function createBuyable<T extends BuyableOptions>(
         });
         processComputable(buyable as T, "canPurchase");
         buyable.canClick = buyable.canPurchase as ProcessedComputable<boolean>;
-        buyable.onClick = buyable.purchase = function () {
+        /*buyable.onClick = buyable.purchase = function () {
             const genericBuyable = buyable as GenericBuyable;
             if (
                 !unref(genericBuyable.canPurchase) ||
@@ -157,7 +157,7 @@ export function createBuyable<T extends BuyableOptions>(
             genericBuyable.resource.value = Decimal.sub(genericBuyable.resource.value, cost);
             genericBuyable.amount.value = Decimal.add(genericBuyable.amount.value, 1);
             this.onPurchase?.(cost);
-        };
+        };*/
         processComputable(buyable as T, "display");
         const display = buyable.display;
         buyable.display = jsx(() => {

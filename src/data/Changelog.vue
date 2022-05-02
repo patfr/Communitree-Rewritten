@@ -5,13 +5,19 @@
         </template>
         <template v-slot:body>
             <details open>
-                <summary>v0.0 Initial Commit - <time>2021-09-04</time></summary>
-                This is the first release :D
+                <summary>v0.2 Tree - <time>2022-05-02</time></summary>
                 <ul>
-                    <li class="feature">Did everything</li>
-                    <li class="fix">Had some fun</li>
-                    <li class="breaking">Removed everything</li>
-                    <li class="balancing">Created some bugs to fix later</li>
+                    <li class="feature">Added The Prestige Tree layer</li>
+                    <li class="feature">Added one upgrades</li>
+                    <li class="balancing">Didn't care to find endgame sorry</li>
+                </ul>
+            </details>
+            <details closed>
+                <summary>v0.1 Initial release - <time>2022-05-01</time></summary>
+                <ul>
+                    <li class="feature">Added Jacorb layer</li>
+                    <li class="feature">Added four upgrades</li>
+                    <li class="balancing">Balanced till 100 Jacorb points</li>
                 </ul>
             </details>
         </template>
