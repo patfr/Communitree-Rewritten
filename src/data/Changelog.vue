@@ -11,6 +11,7 @@
                     <li class="feature">Added Boosters</li>
                     <li class="feature">Added Generators</li>
                     <li class="feature">Added glow to nodes</li>
+                    <li class="feature">Added hotkeys</li>
                     <li class="feature">
                         Added a Changed & Deleted classes for the changelog because thepaperpilot
                         didn't
