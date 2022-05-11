@@ -8,7 +8,8 @@ import player, { PlayerData } from "game/player";
 import Decimal, { DecimalSource, format, formatTime } from "util/bignum";
 import { render } from "util/vue";
 import { computed, toRaw } from "vue";
-import prestige from "./layers/prestige";
+import jacorb from "./layers/jacorb";
+import prestree from "./layers/tree";
 
 /**
  * @hidden
@@ -21,11 +22,12 @@ export const main = createLayer("main", () => {
     const pointGain = computed(() => {
         // eslint-disable-next-line prefer-const
         let gain = new Decimal(0);
-        if (prestige.upgrades.Beginning.bought.value) gain = new Decimal(1);
-        if (prestige.upgrades.Init.bought.value)
-            gain = gain.mul(prestige.upgradeEffects.InitEffect.value);
-        if (prestige.upgrades.Pro.bought.value)
-            gain = gain.mul(prestige.upgradeEffects.ProEffect.value);
+        if (jacorb.upgrades.Beginning.bought.value) gain = new Decimal(1);
+        if (jacorb.upgrades.Init.bought.value)
+            gain = gain.mul(jacorb.upgradeEffects.InitEffect.value);
+        if (jacorb.upgrades.Pro.bought.value)
+            gain = gain.mul(jacorb.upgradeEffects.ProEffect.value);
+        gain = gain.mul(prestree.buyableEffects.prestigeEffect.value);
         return gain;
     });
     globalBus.on("update", diff => {
@@ -34,10 +36,10 @@ export const main = createLayer("main", () => {
     const oomps = trackOOMPS(points, pointGain);
 
     const tree = createTree(() => ({
-        nodes: [[prestige.treeNode]],
-        branches: [],
+        nodes: [[jacorb.treeNode, prestree.treeNode]],
+        branches: [{ startNode: jacorb.treeNode, endNode: prestree.treeNode, "stroke-width": 25 }],
         onReset() {
-            points.value = toRaw(this.resettingNode.value) === toRaw(prestige.treeNode) ? 0 : 10;
+            points.value = toRaw(this.resettingNode.value) === toRaw(jacorb.treeNode) ? 0 : 10;
             best.value = points.value;
             total.value = points.value;
         },
@@ -62,6 +64,7 @@ export const main = createLayer("main", () => {
                     {Decimal.lt(points.value, "1e1e6") ? <span> points</span> : null}
                 </div>
                 {Decimal.gt(pointGain.value, 0) ? <div>({oomps.value})</div> : null}
+                (Original game in Info)
                 <Spacer />
                 {render(tree)}
             </>
@@ -77,7 +80,7 @@ export const main = createLayer("main", () => {
 export const getInitialLayers = (
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
     player: Partial<PlayerData>
-): Array<GenericLayer> => [main, prestige];
+): Array<GenericLayer> => [main, jacorb, prestree];
 
 export const hasWon = computed(() => {
     return false;

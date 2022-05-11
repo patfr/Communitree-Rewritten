@@ -17,6 +17,16 @@
                 <div>
                     Made in Profectus, by thepaperpilot with inspiration from Acameada and Jacorb
                 </div>
+                <div>
+                    Original game by ducdat0507: Communitree
+                    <a
+                        href="https://ducdat0507.github.io/communitree/"
+                        class="link"
+                        style="display: inline"
+                        target="_blank"
+                        >Link</a
+                    >
+                </div>
                 <br />
                 <div class="link" @click="openChangelog">Changelog</div>
                 <br />

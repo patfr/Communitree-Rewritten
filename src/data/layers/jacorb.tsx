@@ -35,6 +35,7 @@ const layer = createLayer(id, () => {
         color,
         reset
     }));
+
     addTooltip(treeNode, {
         display: createResourceTooltip(points),
         pinnable: true
@@ -73,7 +74,7 @@ const layer = createLayer(id, () => {
     }));
 
     const ProEffect = computed(() => {
-        return Decimal.add(main.points.value, 1).sqrt().pow(0.5);
+        return Decimal.div(main.points.value, 5).add(2).pow(0.4);
     });
 
     const Pro = createUpgrade(() => ({
@@ -90,7 +91,7 @@ const layer = createLayer(id, () => {
     }));
 
     const ReleaseEffect = computed(() => {
-        return Decimal.add(main.points.value, 1).log10().add(1);
+        return Decimal.div(main.points.value, 10).add(1).pow(0.25);
     });
 
     const Release = createUpgrade(() => ({
@@ -106,6 +107,18 @@ const layer = createLayer(id, () => {
         resource: points
     }));
 
+    const More = createUpgrade(() => ({
+        display: {
+            title: "More?",
+            description: "Unlock something new."
+        },
+        visibility: computed(() => {
+            return Release.bought.value ? Visibility.Visible : Visibility.None;
+        }),
+        cost: 15,
+        resource: points
+    }));
+
     const conversion = createCumulativeConversion(() => ({
         scaling: createPolynomialScaling(10, 0.5),
         baseResource: main.points,
@@ -116,7 +129,7 @@ const layer = createLayer(id, () => {
         )
     }));
 
-    const upgrades = { Beginning, Init, Pro, Release };
+    const upgrades = { Beginning, Init, Pro, Release, More };
     const upgradeEffects = { InitEffect, ProEffect, ReleaseEffect };
 
     return {
@@ -130,7 +143,13 @@ const layer = createLayer(id, () => {
                 <MainDisplay resource={points} color={color} />
                 {render(resetButton)}
                 <Spacer height={"30px"} />
-                {renderRow(upgrades.Beginning, upgrades.Init, upgrades.Pro, upgrades.Release)}
+                {renderRow(
+                    upgrades.Beginning,
+                    upgrades.Init,
+                    upgrades.Pro,
+                    upgrades.Release,
+                    upgrades.More
+                )}
             </>
         )),
         treeNode
