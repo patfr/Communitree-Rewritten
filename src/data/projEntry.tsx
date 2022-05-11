@@ -1,13 +1,15 @@
 import Spacer from "components/layout/Spacer.vue";
-import { jsx } from "features/feature";
+import { jsx, Visibility } from "features/feature";
+import { trackResetTime } from "features/reset";
 import { createResource, trackBest, trackOOMPS, trackTotal } from "features/resources/resource";
 import { branchedResetPropagation, createTree, GenericTree } from "features/trees/tree";
 import { globalBus } from "game/events";
 import { createLayer, GenericLayer } from "game/layers";
+import { Persistent } from "game/persistence";
 import player, { PlayerData } from "game/player";
 import Decimal, { DecimalSource, format, formatTime } from "util/bignum";
 import { render } from "util/vue";
-import { computed, toRaw } from "vue";
+import { computed, ComputedRef, toRaw } from "vue";
 import jacorb from "./layers/jacorb";
 import prestree from "./layers/tree";
 
@@ -19,6 +21,8 @@ export const main = createLayer("main", () => {
     const best = trackBest(points);
     const total = trackTotal(points);
 
+    const jacorbTime = trackResetTime(jacorb, jacorb.treeNode.reset);
+
     const pointGain = computed(() => {
         // eslint-disable-next-line prefer-const
         let gain = new Decimal(0);
@@ -28,6 +32,8 @@ export const main = createLayer("main", () => {
         if (jacorb.upgrades.Pro.bought.value)
             gain = gain.mul(jacorb.upgradeEffects.ProEffect.value);
         gain = gain.mul(prestree.buyableEffects.prestigeEffect.value);
+        gain = gain.mul(prestree.buyableEffects.boosterEffect.value);
+        gain = gain.mul(prestree.buyableEffects.generatorEffect.value);
         return gain;
     });
     globalBus.on("update", diff => {
@@ -37,7 +43,9 @@ export const main = createLayer("main", () => {
 
     const tree = createTree(() => ({
         nodes: [[jacorb.treeNode, prestree.treeNode]],
-        branches: [{ startNode: jacorb.treeNode, endNode: prestree.treeNode, "stroke-width": 25 }],
+        /*branches() {
+            return  [prestree.treeNode.visibility.value === Visibility.None ? { startNode: jacorb.treeNode, endNode: jacorb.treeNode, "stroke-width": 0 } : { startNode: jacorb.treeNode, endNode: prestree.treeNode, "stroke-width": 25 }]
+        },*/
         onReset() {
             points.value = toRaw(this.resettingNode.value) === toRaw(jacorb.treeNode) ? 0 : 10;
             best.value = points.value;
@@ -69,6 +77,7 @@ export const main = createLayer("main", () => {
                 {render(tree)}
             </>
         )),
+        jacorbTime,
         points,
         best,
         total,
@@ -83,6 +92,7 @@ export const getInitialLayers = (
 ): Array<GenericLayer> => [main, jacorb, prestree];
 
 export const hasWon = computed(() => {
+    if (Decimal.gte(prestree.boost.value, 2) && Decimal.gte(prestree.gens.value, 2)) return true;
     return false;
 });
 

@@ -5,7 +5,7 @@
 import { main } from "data/projEntry";
 import { createCumulativeConversion, createPolynomialScaling } from "features/conversion";
 import { jsx, Visibility } from "features/feature";
-import { createReset } from "features/reset";
+import { createReset, trackResetTime } from "features/reset";
 import MainDisplay from "features/resources/MainDisplay.vue";
 import Spacer from "components/layout/Spacer.vue";
 import { createResource } from "features/resources/resource";
@@ -18,7 +18,8 @@ import { render, renderRow } from "util/vue";
 import { createLayerTreeNode, createResetButton } from "../common";
 import { computed } from "vue";
 import { format } from "util/break_eternity";
-import { createMultiplicativeModifier, createSequentialModifier } from "game/modifiers";
+import { createHotkey } from "features/hotkey";
+import { globalBus } from "game/events";
 
 const id = "j";
 const layer = createLayer(id, () => {
@@ -30,21 +31,13 @@ const layer = createLayer(id, () => {
         thingsToReset: (): Record<string, unknown>[] => [layer]
     }));
 
-    const treeNode = createLayerTreeNode(() => ({
-        layerID: id,
-        color,
-        reset
-    }));
-
-    addTooltip(treeNode, {
-        display: createResourceTooltip(points),
-        pinnable: true
-    });
-
     const resetButton = createResetButton(() => ({
         conversion,
         tree: main.tree,
-        treeNode
+        treeNode,
+        onClick() {
+            globalBus.emit("reset", reset);
+        }
     }));
 
     const Beginning = createUpgrade(() => ({
@@ -57,7 +50,7 @@ const layer = createLayer(id, () => {
     }));
 
     const InitEffect = computed(() => {
-        return Decimal.div(points.value, 2).add(2).pow(0.5);
+        return Decimal.add(points.value, 2).log2().add(1);
     });
 
     const Init = createUpgrade(() => ({
@@ -74,7 +67,7 @@ const layer = createLayer(id, () => {
     }));
 
     const ProEffect = computed(() => {
-        return Decimal.div(main.points.value, 5).add(2).pow(0.4);
+        return Decimal.add(main.points.value, 5).log(5);
     });
 
     const Pro = createUpgrade(() => ({
@@ -90,15 +83,10 @@ const layer = createLayer(id, () => {
         resource: points
     }));
 
-    const ReleaseEffect = computed(() => {
-        return Decimal.div(main.points.value, 10).add(1).pow(0.25);
-    });
-
     const Release = createUpgrade(() => ({
         display: {
             title: "Release.",
-            description: "Points boost Jacorb point gain.",
-            effectDisplay: jsx(() => <>x{format(ReleaseEffect.value)}</>)
+            description: "Unlock something new."
         },
         visibility: computed(() => {
             return Pro.bought.value ? Visibility.Visible : Visibility.None;
@@ -107,30 +95,45 @@ const layer = createLayer(id, () => {
         resource: points
     }));
 
-    const More = createUpgrade(() => ({
-        display: {
-            title: "More?",
-            description: "Unlock something new."
-        },
-        visibility: computed(() => {
-            return Release.bought.value ? Visibility.Visible : Visibility.None;
-        }),
-        cost: 15,
-        resource: points
-    }));
-
     const conversion = createCumulativeConversion(() => ({
         scaling: createPolynomialScaling(10, 0.5),
         baseResource: main.points,
         gainResource: points,
-        roundUpCost: true,
-        gainModifier: createSequentialModifier(
-            createMultiplicativeModifier(ReleaseEffect.value, "desc", Release.bought)
-        )
+        roundUpCost: true
     }));
 
-    const upgrades = { Beginning, Init, Pro, Release, More };
-    const upgradeEffects = { InitEffect, ProEffect, ReleaseEffect };
+    const treeNode = createLayerTreeNode(() => ({
+        layerID: id,
+        color,
+        reset,
+        glowColor() {
+            if (Beginning.canPurchase.value) return "red";
+            if (Init.canPurchase.value) return "red";
+            if (Pro.canPurchase.value) return "red";
+            if (Release.canPurchase.value) return "red";
+            if (Decimal.gt(conversion.currentGain.value, points.value)) return "#afafaf";
+            return "";
+        }
+    }));
+
+    addTooltip(treeNode, {
+        display: createResourceTooltip(points),
+        pinnable: true
+    });
+
+    const hotkeyJ = createHotkey(() => ({
+        key: "j",
+        description: "Reset for Jacorb points",
+        onPress() {
+            if (!resetButton.canClick.value) return;
+            resetButton.conversion.convert();
+            globalBus.emit("reset", reset);
+            resetButton.tree.reset(treeNode);
+        }
+    }));
+
+    const upgrades = { Beginning, Init, Pro, Release };
+    const upgradeEffects = { InitEffect, ProEffect };
 
     return {
         name,
@@ -138,18 +141,13 @@ const layer = createLayer(id, () => {
         points,
         upgrades,
         upgradeEffects,
+        hotkeyJ,
         display: jsx(() => (
             <>
                 <MainDisplay resource={points} color={color} />
                 {render(resetButton)}
                 <Spacer height={"30px"} />
-                {renderRow(
-                    upgrades.Beginning,
-                    upgrades.Init,
-                    upgrades.Pro,
-                    upgrades.Release,
-                    upgrades.More
-                )}
+                {renderRow(upgrades.Beginning, upgrades.Init, upgrades.Pro, upgrades.Release)}
             </>
         )),
         treeNode
