@@ -19,5 +19,5 @@
 	"maxTickLength": 3600,
 	"offlineLimit": 0,
 	"enablePausing": true,
-	"saveEncoding": "lz"
+	"exportEncoding": "base64"
 }
