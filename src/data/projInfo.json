@@ -5,8 +5,8 @@
 	"discordName": "The Paper Pilot Community",
 	"discordLink": "https://discord.gg/WzejVAx",
 
-	"versionNumber": "0.2",
-	"versionTitle": "Tree",
+	"versionNumber": "0.3",
+	"versionTitle": "Rows",
 
 	"allowGoBack": true,
 	"defaultShowSmall": false,
@@ -19,5 +19,5 @@
 	"maxTickLength": 3600,
 	"offlineLimit": 0,
 	"enablePausing": true,
-	"saveEncoding": "lz"
+	"exportEncoding": "base64"
 }

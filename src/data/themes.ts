@@ -9,11 +9,13 @@ export interface ThemeVars {
     "--highlighted": string;
     "--bought": string;
     "--danger": string;
+    "--deleted": string;
     "--link": string;
     "--outline": string;
     "--accent1": string;
     "--accent2": string;
     "--accent3": string;
+    "--accent4": string;
     "--border-radius": string;
     "--modal-border": string;
     "--feature-margin": string;
@@ -43,11 +45,13 @@ const defaultTheme: Theme = {
         "--highlighted": "#333",
         "--bought": "#77bf5f",
         "--danger": "rgb(220, 53, 69)",
+        "--deleted": "#732020",
         "--link": "#02f2f2",
         "--outline": "#dfdfdf",
         "--accent1": "#627a82",
         "--accent2": "#658262",
         "--accent3": "#7c6282",
+        "--accent4": "#e69943",
 
         "--border-radius": "15px",
         "--modal-border": "solid 2px var(--color)",
