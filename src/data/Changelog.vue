@@ -5,6 +5,18 @@
         </template>
         <template v-slot:body>
             <details open>
+                <summary>v0.3 Rows - <time>2022-12-02</time></summary>
+                <ul>
+                    <li class="feature">Added another row</li>
+                    <li class="feature">
+                        Added a Changed class for the changelog because thepaperpilot didn't
+                    </li>
+                    <li class="changed">This is a changed :O</li>
+                    <li class="balancing">Rebalanced the game</li>
+                    <li class="balancing">Endgame: No</li>
+                </ul>
+            </details>
+            <details closed>
                 <summary>v0.2 Tree - <time>2022-05-02</time></summary>
                 <ul>
                     <li class="feature">Added The Prestige Tree layer</li>
@@ -80,6 +92,11 @@ li::before {
 .balancing::before {
     content: "Balancing";
     background: var(--accent3);
+}
+
+.changed::before {
+    content: "Changed";
+    background: var(--accent4);
 }
 
 .breaking::before {
